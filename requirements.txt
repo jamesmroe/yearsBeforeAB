@@ -42,3 +42,9 @@ data.table==1.14.2
 stringi==1.7.6
 ggseg==1.6.5
 
+
+Installation:
+Install R at https://www.r-project.org/
+Optional: Install R studio at https://www.rstudio.com/products/rstudio/
+Typical install time on a "normal" desktop computer: 30 minutes
+
