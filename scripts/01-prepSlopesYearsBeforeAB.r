@@ -48,7 +48,7 @@ cat(sprintf("singleT = %s\n", singleT))
 
 
 # analysnum=1
-# cohortSelect = "adnibacslcbc" #"adnibacs" "bacslcbc" "adnilcbc"
+# cohortSelect = "adnibacslcbc"
 # yearsBeforeAB = 1
 # matchFollow = 0
 # procType = "LONG"
@@ -106,7 +106,7 @@ saveres=T
 
 #load and combine data
 load(file.path(b,"reproduce/data/DF_BACSUPDATE_PREPPED_AB.Rda"))
-load(file.path(b,"DF_ADNIUPDATE_PREPPED_AB.Rda"))
+load(file.path(b,"reproduce/data/DF_ADNIUPDATE_PREPPED_AB.Rda"))
 ADNI = ADNIEXPORT
 BACS = BACSEXPORT
 allFeat = readLines(file.path(b, "reproduce/data/allFeatures364.txt"))
@@ -375,7 +375,7 @@ mytheme = theme(
 
 
 # note that below needs to be commented out or script fails on cluster
-# (pcovnall = convall %>% 
+# (pcovnall = convall %>%
 #     # filter(usable == 1) %>%
 #     ggplot(.) +
 #       geom_line(aes(x=Age,y=SID_scan,group=SID_scan), col="grey",alpha=0.7, size=1) +
@@ -482,11 +482,11 @@ dim(DF.conv); length(unique(DF.conv$subject_id))
 
 
 
-# # load updated LCBC amyloid data
+# load updated LCBC amyloid data
 lcbcABnew=1
 if (lcbcABnew == 1) {
 
-  df_AB_LCBC = read.csv(file.path(b, "amyloid_to_p274/AB_classification.tsv"), sep = "\t")
+  df_AB_LCBC = read.csv(file.path(b, "reproduce/data/AB_classification.tsv"), sep = "\t")
   df_AB_LCBC$subject_id = substr(df_AB_LCBC$raw_name, 1, 7)
   df_AB_LCBC %<>% group_by(subject_id) %>% mutate(nTimesAB = n(), nTimeAB = row_number(), converter = ifelse(length(unique(AB_class))>1, "converter", "nonconverter") )
   length(unique(df_AB_LCBC$subject_id))
@@ -494,7 +494,7 @@ if (lcbcABnew == 1) {
   names(df_AB_LCBC)[1] = "Folder"
   
   # pet timestamps
-  pet_times = fread(file.path(b, "pet_timestamps.txt")) %>% rename(Folder = SUBJECTID)
+  pet_times = fread(file.path(b, "reproduce/data/pet_timestamps.txt")) %>% rename(Folder = SUBJECTID)
   pet_times$subject_id = as.character(pet_times$subject_id)
   df_AB_LCBC = left_join(df_AB_LCBC, pet_times)
   U_AB_LCBC = df_AB_LCBC %>% filter(nTimeAB == 1)
@@ -525,10 +525,10 @@ dim(tmp2); length(unique(tmp2$SID))
 tmp3 = df_ABintersectNC_ADNI %>% filter(PTID %in% DF$subject_id)
 dim(tmp3); length(unique(tmp3$PTID))
 
+# Of 691 individuals that also had Aβ PET scans, we used a total of 1684 Aβ PET scans
 total_AB = nrow(tmp1) + nrow(tmp2) + nrow(tmp3)
 total_AB_N = length(unique(tmp1$subject_id)) + length(unique(tmp2$SID)) + length(unique(tmp3$PTID))
 total_AB; total_AB_N
-
 
 
 range(DF$intervalFirstlast)
@@ -542,8 +542,8 @@ DF %<>% filter(!imageLink %in% unusable) %>%
                                   meanAge = mean(visit_age),
                                   nTimepoints= length(unique(visit_age)),
                                   intervalFirstlast = max(visit_age) - min(visit_age)) %>% filter(nTimepoints>=nTime)
-    
   
+
 dim(DF); length(unique(DF$subject_id))
 
 
@@ -705,18 +705,49 @@ dim(DF); length(unique(DF$subject_id))
 
 
 
-rois=allFeat[grepl("thickness", allFeat)]
-nrois=length(rois)
-subset.size=nrois; jj = 1
+rois = allFeat[grepl("thickness", allFeat)]
+nrois = length(rois)
+subset.size = nrois; jj = 1
 N = ceiling(nrois/subset.size)
 print(N)
 start = (jj*subset.size)-subset.size+1
-end = nrois
-loopend = end
+end = subset.size
 print(paste("subsetting cols", start, "-", end))
 rois = rois[start:end]
 print(rois)
 ROIs = rois
+subvolrois = allFeat[grepl("vol\\.", allFeat)]
+ROIs = c(
+  
+  "vol.Left.Lateral.Ventricle",
+  "vol.Right.Lateral.Ventricle",
+  "vol.Left.Inf.Lat.Vent",
+  "vol.Right.Inf.Lat.Vent",
+  "vol.Left.Thalamus",
+  "vol.Right.Thalamus",
+  "vol.Left.Caudate",
+  "vol.Right.Caudate",
+  "vol.Left.Putamen",
+  "vol.Right.Putamen",
+  "vol.Left.Pallidum",
+  "vol.Right.Pallidum",
+  "vol.Left.Hippocampus",
+  "vol.Right.Hippocampus",
+  "vol.Left.Amygdala",
+  "vol.Right.Amygdala",
+  "vol.Left.Accumbens.area",
+  "vol.Right.Accumbens.area",
+  "vol.Left.VentralDC",
+  "vol.Right.VentralDC",
+  "vol.Left.choroid.plexus",
+  "vol.Right.choroid.plexus",
+  "vol.WM.hypointensities",
+  rois
+)
+nrois = length(ROIs)
+subset.size = nrois; jj = 1
+loopend = nrois
+
 
 
 pb = txtProgressBar(min=2, max=end, style=3)
@@ -741,7 +772,7 @@ DF.both = rbind(DF.conv %>% mutate(convgroup = 1),
 fullDF = DF
 
 
-# LOOP ROIS  ------------------------------------------------
+
 for (i in 1:length(ROIs)){
   
   print(paste(i,"/",subset.size))
@@ -754,8 +785,6 @@ for (i in 1:length(ROIs)){
   setTxtProgressBar(pb,i)
   set.seed(123)
   ROI = ROIs[i]
-  # ROI = "lh_superiorfrontal_thickness.aparcnative71"
-  # ROI = "lh_rostralmiddlefrontal_thickness.aparcnative71"
   DF$brainvar = DF[[ROI]]
 
   
@@ -799,6 +828,7 @@ for (i in 1:length(ROIs)){
   print("finished")
   toc()
   
+  
   g.sum = summary(g$gam)
   dug = itsadug::get_predictions(g$gam,
                                  cond = list(visit_age = seq(
@@ -813,13 +843,13 @@ for (i in 1:length(ROIs)){
                                  se = T))
   
 
-  predictions <- DF %>% 
+  predictions = DF %>% 
     mutate(subject_sex = "Female",  cohort = "ADNINC", scanStrength = "1-5T", ICV=0) %>% 
     select(visit_age,subject_sex,ICV,mri_info_site_name,scanStrength, cohort) %>% 
     predict(g$gam, newdata = ., se.fit = T)
  
   
-  residualsg <- residuals(g$mer)
+  residualsg = residuals(g$mer)
   DF$partial_residuals = predictions$fit + residualsg
   DF$fit = predictions$fit
   DF$sefit = predictions$se.fit
@@ -909,7 +939,7 @@ for (i in 1:length(ROIs)){
   DF %>% filter(convertgroup == 0) %>% dim()
   
   
-  #NB! this includes NA
+  # NB! this includes NA in count
   unique(DF$subject_id[DF$convertgroup == 1])
   DF$subject_id[DF$convertgroup == 1 & !is.na(DF$convertgroup)] %in% unique(DF.conv$subject_id)
   length(unique(DF$subject_id[DF$convertgroup == 1]))
@@ -944,7 +974,7 @@ for (i in 1:length(ROIs)){
     
   
   
-  #check outliers
+  # check outliers
   outlierThresh = function(U, outlierthresh, ranef) {
     
     if (!singleT) {
@@ -1008,10 +1038,10 @@ for (i in 1:length(ROIs)){
   )
   
   
-  #add random effect to curve derivative to get vals of slope
+  # add random effect to curve derivative to get vals of slope
   plot(U$meanAge, dd$.derivative)
-  U$absChange=U$rSlope+dd$.derivative
-  plot(U$meanAge,U$absChange,col="blue", main = ROI)
+  U$absChange = U$rSlope+dd$.derivative
+  plot(U$meanAge,U$absChange, col="blue", main = ROI)
   
   
   (fig3 = ggplot() +
@@ -1029,7 +1059,7 @@ for (i in 1:length(ROIs)){
       ) )
   
   
-  (cp1 = cowplot::plot_grid(fig1,fig3,fig2,ncol=3))
+  (cp1 = cowplot::plot_grid(fig1, fig3, fig2, ncol=3))
   
   
   derivMat[,i] = dd$.derivative
@@ -1068,12 +1098,16 @@ for (i in 1:length(ROIs)){
   print(paste("saving full data without adnioutlier", filename2))
   
   
-  write.table(
-    tmpmod, filename1
+  if (saveres) {
+    
+    write.table(
+      tmpmod, filename1
+      )
+    write.table(
+      Uconvnoout, filename2
     )
-  write.table(
-    Uconvnoout, filename2
-  )
+  
+  }
   
   
   if (savefigs) {
@@ -1126,20 +1160,20 @@ if (! dir.exists(resdir)) {
 }
 
 
-ROIs.all=ROIs
-U.all=U
+ROIs.all = ROIs
+U.all = U
 Uconv.all = Uconv
 Uconvnoout.all = Uconvnoout
-derivMat.all=derivMat
-absChangeMat.all=absChangeMat
-rIntMat.all=rIntMat
-rIntonlyMat.all=rIntonlyMat
-rSlopeMat.all=rSlopeMat
-predMat.all=predMat
-seMat.all=seMat
-RR.all=RR
+derivMat.all = derivMat
+absChangeMat.all = absChangeMat
+rIntMat.all = rIntMat
+rIntonlyMat.all = rIntonlyMat
+rSlopeMat.all = rSlopeMat
+predMat.all = predMat
+seMat.all = seMat
+RR.all = RR
 # outlierMat1.all=outlierMat1
-DF.all=DF
+DF.all = DF
 DF.conv.all = DF.conv
 save(
   "DF.all",
