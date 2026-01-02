@@ -1,0 +1,57 @@
+#!/bin/bash 
+
+#SBATCH -J WeGammin
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=3G
+#SBATCH --time=05:30:00
+#SBATCH --account=p274
+#SBATCH --output logs-01/slurm-%j.txt
+
+
+
+module purge
+loadR() {
+	echo "loading R"
+	module load R/4.2.1-foss-2022a
+
+	#R aliases
+	export R_LIBS_SITE=/cluster/projects/p274/tools/r/r_libs/$(R --version | grep "R version" | awk '{print $3}')
+	if [ ! -d $R_LIBS_SITE ]; then
+	mkdir -p $R_LIBS_SITE
+	fi
+	export R_LIBS_USER=$HOME/R/x86_64-redhat-linux-gnu-library/$(R --version | grep "R version" | awk '{print $3}')
+	if [ ! -d $R_LIBS_USER ]; then
+	mkdir -p $R_LIBS_USER
+	fi
+}
+loadR
+echo `which R`
+set -o errexit
+
+
+echo -e "
+-----INPUTS -----
+analysnum=${1}
+analysname=${2}
+cohortSelect=${3}
+yearsBeforeAB=${4}
+matchFollow=${5}
+procType=${6}
+predAB=${7}
+singleT=${8}
+"
+
+analysnum=${1}
+analysname=${2}
+cohortSelect=${3}
+yearsBeforeAB=${4}
+matchFollow=${5}
+procType=${6}
+predAB=${7}
+singleT=${8}
+
+#RUN
+cmd="Rscript 01-prepSlopesYearsBeforeAB.r $analysnum $analysname $cohortSelect $yearsBeforeAB $matchFollow $procType $predAB $singleT"
+echo $cmd
+# exit 0
+Rscript 01-prepSlopesYearsBeforeAB.r $analysnum $analysname $cohortSelect $yearsBeforeAB $matchFollow $procType $predAB $singleT
