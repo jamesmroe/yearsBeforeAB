@@ -1,0 +1,40 @@
+#!/bin/bash 
+
+
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=8G
+#SBATCH --time=01:30:00
+#SBATCH --account=p274
+#SBATCH --output logs-04/slurm-%j.txt
+
+
+
+module purge
+loadR() {
+	echo "loading R"
+	module load R/4.2.1-foss-2022a
+
+	#R aliases
+	export R_LIBS_SITE=/cluster/projects/p274/tools/r/r_libs/$(R --version | grep "R version" | awk '{print $3}')
+	if [ ! -d $R_LIBS_SITE ]; then
+	mkdir -p $R_LIBS_SITE
+	fi
+	export R_LIBS_USER=$HOME/R/x86_64-redhat-linux-gnu-library/$(R --version | grep "R version" | awk '{print $3}')
+	if [ ! -d $R_LIBS_USER ]; then
+	mkdir -p $R_LIBS_USER
+	fi
+}
+loadR
+echo `which R`
+set -o errexit
+
+
+echo $1 $2 $3 $4
+
+analysname=${1}
+yearsBeforeAB=${2}
+metric=${3}
+nTime=${4}
+
+#RUN
+Rscript 04-cortmaps_summarize.r $analysname $yearsBeforeAB $metric $nTime
