@@ -41,4 +41,4 @@ nTime=${6}
 echo "Submitting split number: ${start}-${end}"
 
 #RUN resampled cortical map
-Rscript 03-cortmaps_resample_nTime.R $start $end $yearsBeforeAB $analysname $metric $nTime
+Rscript 03-cortmaps_resample_nTime.r $start $end $yearsBeforeAB $analysname $metric $nTime
