@@ -2,7 +2,9 @@
 # Author: James M Roe, Ph.D.
 # Center for Lifespan Changes in Brain and Cognition, University of Oslo
 #
-# Purpose:
+# Purpose: Load GAMM random slopes and intercepts and test cortex-wide models comparing thickness effects 
+#          between Aβ+ converter and Aβ− groups at given distances from observed/predicted Aβ+.
+#          Script requires individual-level data as input and is not executable
 #========================================================================================#
 
 

@@ -1,3 +1,11 @@
+#========================================================================================#
+# Author: James M Roe, Ph.D.
+# Center for Lifespan Changes in Brain and Cognition, University of Oslo
+#
+# Purpose: Summarize results from resampling-based robustness check
+#========================================================================================#
+
+
 # rm(list=ls())
 library("readr"); library("dplyr"); library("data.table"); library("magrittr")
 

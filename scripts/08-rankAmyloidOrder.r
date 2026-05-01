@@ -503,6 +503,44 @@ maplistpred10 = ggSegIt(imap = predtraj10 %>%
                         1, 1.2)
 
 
+predtrajOut = rbind(
+  predtraj1 %>%
+    mutate(SUVR_above_reference = ifelse(SUVR < 1, NA, SUVR),
+           predictedYearsBeforepredAB = 1),
+  predtraj2 %>%
+    mutate(SUVR_above_reference = ifelse(SUVR < 1, NA, SUVR),
+           predictedYearsBeforepredAB = 2),
+  predtraj3 %>%
+    mutate(SUVR_above_reference = ifelse(SUVR < 1, NA, SUVR),
+           predictedYearsBeforepredAB = 3),
+  predtraj4 %>%
+    mutate(SUVR_above_reference = ifelse(SUVR < 1, NA, SUVR),
+           predictedYearsBeforepredAB = 4),
+  predtraj5 %>%
+    mutate(SUVR_above_reference = ifelse(SUVR < 1, NA, SUVR),
+           predictedYearsBeforepredAB = 5),
+  predtraj6 %>%
+    mutate(SUVR_above_reference = ifelse(SUVR < 1, NA, SUVR),
+           predictedYearsBeforepredAB = 6),
+  predtraj7 %>%
+    mutate(SUVR_above_reference = ifelse(SUVR < 1, NA, SUVR),
+           predictedYearsBeforepredAB = 7),
+  predtraj8 %>%
+    mutate(SUVR_above_reference = ifelse(SUVR < 1, NA, SUVR),
+           predictedYearsBeforepredAB = 8),
+  predtraj9 %>%
+    mutate(SUVR_above_reference = ifelse(SUVR < 1, NA, SUVR),
+           predictedYearsBeforepredAB = 9),
+  predtraj10 %>%
+    mutate(SUVR_above_reference = ifelse(SUVR < 1, NA, SUVR),
+           predictedYearsBeforepredAB = 10)
+)
+# write.table(predtrajOut, file = file.path(b, "reproduce/data/cortmapPredTraj.csv"),
+#             quote = F, row.names = F, col.names = T)
+# write.table(predtraj, file = file.path(b, "reproduce/data/predTraj.csv"),
+#             quote = F, row.names = F, col.names = T)
+
+
 # Fig 5c combine maps predicted -----------
 (ggPredTraj = ggarrange(
   maplistpred1$ggSuvr + ggtitle(NULL),

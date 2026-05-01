@@ -5,6 +5,8 @@
 # Purpose: Load simulated GAMM random slopes and intercepts and test
 #          cortex-wide models comparing thickness effects between Aβ+ converters
 #          and Aβ− groups
+#
+#          Script is fully executable
 #========================================================================================#
 
 

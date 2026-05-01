@@ -2,7 +2,9 @@
 # Author: James M Roe, Ph.D.
 # Center for Lifespan Changes in Brain and Cognition, University of Oslo
 #
-# Purpose:
+# Purpose: Compute longitudinal cortical thickness trajectories with GAMMs using MRIs at a given distance from Aβ+ combined with the full longitudinal sample.  
+#          Random intercepts and slopes are estimated at each distance, and the results are saved for subsequent analyses.
+#          Script requires individual-level data as input and is not executable
 #========================================================================================#
 
 
